@@ -18,6 +18,7 @@ export default class Modal extends Component {
     }
 
 
+    //  Функция получения картинки и комментариев к ним с АПИ
     fetchImage = imageId => {
         this.setState({ isLoaded: false }); 
           fetch(`https://tzfrontend.herokuapp.com/images/${imageId}/`, {
@@ -57,7 +58,7 @@ export default class Modal extends Component {
         );
     };
 
-
+    //  Функция отправки комментария на сервер
     postComment = (postName, postComment, imageId) => {
         const data = {
           "name": postName,
@@ -89,16 +90,19 @@ export default class Modal extends Component {
         }
     }
 
+    // Обработчик имени пользователя с инпута
     handleChangeName = (e) => {
       e.preventDefault();
       this.setState({ name: e.target.value });
     }
 
+    // Обработчик комментария пользователя с инпута
     handleChangeComment = (e) => {
       e.preventDefault();
       this.setState({ comment: e.target.value });
     }
 
+    // Обработчик отправки комментария на сервер и ререндер страницы
     handleSubmit = () => {
       let idToNumber = Number.parseInt(this.props.idImg);
       let nameToStr = this.state.name.toString();
@@ -106,6 +110,7 @@ export default class Modal extends Component {
       this.postComment(nameToStr, commentToStr, idToNumber);
     }
     
+     // Компонент жизненного цикла для проверки изменился ли id картинки => выполнение запроса к АПИ с текущим id
     componentDidUpdate = (prevProps) => {
         if (prevProps.idImg !== this.props.idImg) {
           this.fetchImage(this.props.idImg); 

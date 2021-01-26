@@ -16,7 +16,7 @@ export default class Home extends Component {
         };
     }
 
-
+// Получаем картинки с АПИ
     componentDidMount () {
         fetch('https://tzfrontend.herokuapp.com/images/', {
             method: 'GET'
@@ -37,15 +37,18 @@ export default class Home extends Component {
         )
     };
 
+    // Обработчик открытия модального окна
     openModal = (e) => {
         this.setState({ isOpen: true, idImg: e.target.id });
       }
     
-      handleSubmit = () => {
+    // Обработчик отправки комментария 
+    handleSubmit = () => {
         this.setState({ isOpen: false });
       }
     
-      handleCancel = () => {
+    // Обработчик закрытия модального окна
+    handleCancel = () => {
         this.setState({ isOpen: false });
       }
 
