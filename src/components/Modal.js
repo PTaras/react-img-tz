@@ -8,15 +8,19 @@ export default class Modal extends Component {
     constructor(props){
         super(props);
         this.state = {
+            error: null,
+            isLoaded: true,
             imgSrc: '',
-            commentList: []
+            commentList: [],
+            name: '',
+            comment: ''
         }
     }
 
 
     fetchImage = imageId => {
         this.setState({ isLoaded: false }); 
-        fetch(`https://tzfrontend.herokuapp.com/images/${imageId}/`, {
+          fetch(`https://tzfrontend.herokuapp.com/images/${imageId}/`, {
             method: 'GET',
             })
           .then(res => res.json())
@@ -33,6 +37,7 @@ export default class Modal extends Component {
             });
           }
         );
+       
         fetch(`https://tzfrontend.herokuapp.com/comments/${imageId}/`, {
             method: 'GET',
             })
@@ -50,70 +55,124 @@ export default class Modal extends Component {
             });
           }
         );
-      };
+    };
 
 
-    //   componentDidMount() {
-    //     this.fetchImage(this.props.idImg); 
-    //   }
+    postComment = (postName, postComment, imageId) => {
+        const data = {
+          "name": postName,
+          "description": postComment,
+          "image_id": imageId
+        };
+        
+        fetch('https://tzfrontend.herokuapp.com/comments/add/', {
+          'method': 'POST',
+          'Content-Type': 'application/json',
+          body: JSON.stringify(data)
+            })
+            .then(() => {
+            this.setState({
+              isLoaded: true,
+              name: '',
+              comment: ''
+            });
+        },
+        (error) => {
+            this.setState({
+                isLoaded: true,
+                error
+            });
+        }
+        );
+        if (imageId) {
+          this.fetchImage(imageId);
+        }
+    }
+
+    handleChangeName = (e) => {
+      e.preventDefault();
+      this.setState({ name: e.target.value });
+    }
+
+    handleChangeComment = (e) => {
+      e.preventDefault();
+      this.setState({ comment: e.target.value });
+    }
+
+    handleSubmit = () => {
+      let idToNumber = Number.parseInt(this.props.idImg);
+      let nameToStr = this.state.name.toString();
+      let commentToStr = this.state.comment.toString();
+      this.postComment(nameToStr, commentToStr, idToNumber);
+    }
     
-      componentDidUpdate(prevProps) {
+    componentDidUpdate = (prevProps) => {
         if (prevProps.idImg !== this.props.idImg) {
           this.fetchImage(this.props.idImg); 
         }
-      }
-    
+    }
+      
     render() {
-        const { isOpen, onCancel, onSubmit } = this.props;
+        const { isOpen, onCancel, error } = this.props;
 
-        const { imgSrc, commentList } = this.state;
+        const { imgSrc, commentList, isLoaded, name, comment } = this.state;
 
-        return (
-            <>
-              { isOpen &&
-                <Portal>
-                  <div className="modalOverlay">
-                    <div className="modalWindow">
-                      <div className="modalBody">
-                        <div className="container">
-                            <div className="row p-3">
-                                <button type="button" className="btn-close" aria-label="Close" onClick={onCancel}></button>
-                            
-                                <div className="col-lg-8 col-sm-8">
-                                    <div className="row m-1 img">
-                                        <img src={imgSrc}></img>
-                                    </div>
-                                    <div className="row m-3">
-                                        <input type="text" placeholder="Ваше имя"></input>
-                                    </div>
-                                    <div className="row m-3">
-                                    <input type="text" placeholder="Ваш комментарий"></input>
-                                    </div>
-                                    <div className="row m-3">
-                                    <button type="button" className="close btn btn-primary" onClick={onSubmit}>
-                                            Отправить комментарий 
-                                        </button>
-                                    </div>
-                                </div>
-                                <div className="col-lg-3 col-sm-3">
-                                    <div className="row">
-                                        {commentList.map(comment =>(
-                                            <div key={comment.id}>
-                                                <p>{comment.name}</p>
-                                                <b>{comment.description}</b>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+      if (error) {
+          return <p>Error</p>
+      } else if (!isLoaded) {
+          return <p> Loading ... </p>
+      } else {
+       return (
+        <>
+        { isOpen &&
+          <Portal>
+            <div className="modalOverlay">
+              <div className="modalWindow">
+                <div className="modalBody">
+                  <div className="container">
+                      <div className="row p-3">
+                          <button type="button" className="btn-close" aria-label="Close" onClick={onCancel}></button>
+                      
+                          <div className="col-lg-8 col-sm-12">
+                              <div className="row m-1 img">
+                                  <img src={imgSrc}></img>
+                              </div>
+                              <div className="row m-3">
+                                  <input type="text" value={name} placeholder="Ваше имя" required onChange={this.handleChangeName}></input>
+                              </div>
+                              <div className="row m-3">
+                              <input type="text" value={comment} placeholder="Ваш комментарий" required onChange={this.handleChangeComment}></input>
+                              </div>
+                              <div className="row m-3">
+                              <button type="button" className="close btn btn-primary" onClick={this.handleSubmit}>
+                                      Отправить комментарий 
+                                  </button>
+                              </div>
+                          </div>
+                          <div className="col-lg-3 col-sm-12">
+                              <div className="row">
+                                  { this.state.commentList.detail !== undefined ? <p>No comments</p> : commentList.map(comment =>(
+                                      <div key={comment.id} className="container">
+                                        <div className="row">
+                                          <div className="col"><b>{comment.name}</b></div>
+                                        </div>
+                                        <div className="row">
+                                          <div className="col"><p>{comment.description}</p></div>
+                                        </div>
+                                      </div>
+                                  ))}
+                              </div>
+                          </div>
                       </div>
-                    </div>
                   </div>
-                </Portal>
-              }
-            </>
-          );
+                </div>
+              </div>
+            </div>
+          </Portal>
+        }
+      </>
+       )
+      }
     }
 }
 

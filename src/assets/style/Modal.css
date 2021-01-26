@@ -13,11 +13,18 @@
     left: 50%;
     transform: translate(-50%, -50%);
     background-color: #FFF;
-    /* min-height: 50%; */
-    width: 60%;
+    max-width: 800px;
+    max-height: 500px;
+    width: 100%;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+  }
+
+  @media (max-width: 800px) {
+    .modalWindow {
+      max-height: 100%;
+    }
   }
 
   .btn-close {
