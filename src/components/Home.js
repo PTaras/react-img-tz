@@ -14,6 +14,7 @@ export default class Home extends Component {
             images: [],
             idImg: ''
         };
+        // console.log("set", this.state.idImg);
 
     }
 
@@ -39,7 +40,6 @@ export default class Home extends Component {
     };
 
     openModal = (e) => {
-        console.log("1", e.target.id);
         this.setState({ isOpen: true, idImg: e.target.id });
       }
     
@@ -67,7 +67,7 @@ export default class Home extends Component {
                         isOpen={this.state.isOpen}
                         onCancel={this.handleCancel}
                         onSubmit={this.handleSubmit}
-                        _id={this.state.idImg}
+                        idImg={this.state.idImg}
                     ></Modal>
                     {images.map(item => (
                         <div key={item.image_id} className="col-lg-4 col-lg-4 sm-1 p-2" style={{Style}}  >

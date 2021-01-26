@@ -9,50 +9,62 @@ export default class Modal extends Component {
         super(props);
         this.state = {
             imgSrc: '',
-            commentList: '',
-            id: ''
+            commentList: []
         }
     }
 
-    componentDidMount(){
-        fetch(`https://tzfrontend.herokuapp.com/images/${this.props._id}`, {
-            method: 'GET'
+
+    fetchImage = imageId => {
+        this.setState({ isLoaded: false }); 
+        fetch(`https://tzfrontend.herokuapp.com/images/${imageId}/`, {
+            method: 'GET',
             })
-        .then(res => res.json())
-        .then((result) => {
+          .then(res => res.json())
+          .then((result) => {
             this.setState({
-                isLoaded: true,
-                imgSrc: result.src
+              isLoaded: true,
+              imgSrc: result.src
             });
-        },
-        (error) => {
+          },
+          (error) => {
             this.setState({
-                isLoaded: true,
-                error
+              isLoaded: true,
+              error
             });
-        }
+          }
         );
-        fetch(`https://tzfrontend.herokuapp.com/comments/${this.props._id}`, {
-            method: 'GET'
+        fetch(`https://tzfrontend.herokuapp.com/comments/${imageId}/`, {
+            method: 'GET',
             })
-        .then(res => res.json())
-        .then((result) => {
+          .then(res => res.json())
+          .then((result) => {
             this.setState({
-                isLoaded: true,
-                commentList: result
+              isLoaded: true,
+              commentList: result
             });
-        },
-        (error) => {
+          },
+          (error) => {
             this.setState({
-                isLoaded: true,
-                error
+              isLoaded: true,
+              error
             });
+          }
+        );
+      };
+
+
+    //   componentDidMount() {
+    //     this.fetchImage(this.props.idImg); 
+    //   }
+    
+      componentDidUpdate(prevProps) {
+        if (prevProps.idImg !== this.props.idImg) {
+          this.fetchImage(this.props.idImg); 
         }
-        )
-    }
+      }
     
     render() {
-        const { isOpen, onCancel, onSubmit, _id } = this.props;
+        const { isOpen, onCancel, onSubmit } = this.props;
 
         const { imgSrc, commentList } = this.state;
 
@@ -79,7 +91,7 @@ export default class Modal extends Component {
                                     </div>
                                     <div className="row m-3">
                                     <button type="button" className="close btn btn-primary" onClick={onSubmit}>
-                                            Отправить комментарий  
+                                            Отправить комментарий 
                                         </button>
                                     </div>
                                 </div>
